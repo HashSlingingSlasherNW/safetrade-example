@@ -264,8 +264,8 @@ class SafeTrade:
 
     bids = order_book["bids"]
     asks = order_book["asks"]
-    best_bid = bids[0]["price"] if bids else "n/a"
-    best_ask = asks[0]["price"] if asks else "n/a"
+    best_bid = self.get_level_price(bids)
+    best_ask = self.get_level_price(asks)
     bid_depth = self.sum_amounts(bids)
     ask_depth = self.sum_amounts(asks)
     spread = self.calculate_spread(best_bid, best_ask)
@@ -340,7 +340,7 @@ class SafeTrade:
   def calculate_spread(self, best_bid, best_ask):
     bid = self.to_decimal(best_bid)
     ask = self.to_decimal(best_ask)
-    if bid is None or ask is None:
+    if bid is None or ask is None or bid <= 0 or ask <= 0:
       return "n/a"
     return self.format_decimal(ask - bid)
 
@@ -387,6 +387,13 @@ class SafeTrade:
     if trade is None:
       return "n/a"
     return trade.get("side") or trade.get("type") or "n/a"
+
+  def get_level_price(self, levels):
+    for level in levels:
+      price = level.get("price")
+      if self.to_decimal(price) is not None:
+        return price
+    return "n/a"
 
   def format_decimal(self, value):
     if value is None:
