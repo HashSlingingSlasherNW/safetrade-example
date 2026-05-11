@@ -308,10 +308,11 @@ class SafeTrade:
 
   def sum_trade_amounts(self, trades, side=None):
     total = Decimal("0")
+    normalized_side = None if side is None else str(side).lower()
 
     for trade in trades:
       trade_side = trade.get("side") or trade.get("type")
-      if side is not None and (trade_side is None or str(trade_side).lower() != side):
+      if normalized_side is not None and (trade_side is None or str(trade_side).lower() != normalized_side):
         continue
 
       amount = self.to_decimal(trade.get("amount") or trade.get("volume") or trade.get("size"))
@@ -340,16 +341,17 @@ class SafeTrade:
   def calculate_spread(self, best_bid, best_ask):
     bid = self.to_decimal(best_bid)
     ask = self.to_decimal(best_ask)
-    if bid is None or ask is None or bid <= 0 or ask <= 0:
+    if bid is None or ask is None or bid <= 0 or ask <= 0 or bid >= ask:
       return "n/a"
     return self.format_decimal(ask - bid)
 
   def calculate_spread_percent(self, best_bid, best_ask):
     bid = self.to_decimal(best_bid)
     ask = self.to_decimal(best_ask)
-    if bid is None or ask is None or bid <= 0 or ask <= 0:
+    if bid is None or ask is None or bid <= 0 or ask <= 0 or bid >= ask:
       return "n/a"
-    return f"{self.format_decimal(((ask - bid) / ask) * Decimal('100'))}%"
+    midpoint = (bid + ask) / Decimal("2")
+    return f"{self.format_decimal(((ask - bid) / midpoint) * Decimal('100'))}%"
 
   def sort_levels(self, levels, reverse=False):
     return sorted(levels, key=self.level_sort_key, reverse=reverse)
