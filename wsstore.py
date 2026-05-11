@@ -2,17 +2,17 @@ import ws
 import threading
 
 class WebsocketStore:
-  def __init__(self, baseURL, header = None, callback = None):
+  def __init__(self, baseURL, header=None, callback=None):
     self.baseURL = baseURL
     self.header = header
     self.callback = callback
     self.public = None
     self.private = None
 
-  def get_socket(self, type):
-    if type == "public" and self.public is None:
+  def get_socket(self, type, create_socket=True):
+    if create_socket and type == "public" and self.public is None:
       self.public = ws.Websocket(self.baseURL, "public", None, self.callback)
-    elif type == "private" and self.private is None:
+    elif create_socket and type == "private" and self.private is None:
       self.private = ws.Websocket(self.baseURL, "private", self.header, self.callback)
 
     if type == "public":
@@ -27,11 +27,7 @@ class WebsocketStore:
       socket.subscribe(channel)
 
   def unsubscribe(self, type, channel):
-    socket = None
-    if type == "public":
-      socket = self.public
-    elif type == "private":
-      socket = self.private
+    socket = self.get_socket(type, create_socket=False)
     if socket is not None:
       socket.unsubscribe(channel)
 

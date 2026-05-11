@@ -7,7 +7,7 @@ baseURL = "https://safe.trade/api/v2"
 trackedMarket = "cpayusdt"
 publicChannels = ["global.tickers", f"{trackedMarket}.depth", f"{trackedMarket}.trades"]
 
-safetrade = manager.SafeTrade(baseURL, yourAPIkey, yourAPISecret, tracked_markets = [trackedMarket])
+safetrade = manager.SafeTrade(baseURL, yourAPIkey, yourAPISecret, tracked_markets=[trackedMarket])
 
 def websocket_run():
   print(f"Following ticker: {trackedMarket.upper()}")

@@ -3,7 +3,7 @@ import wsstore
 import ticker
 
 class SafeTrade:
-  def __init__(self, baseURL, key, secret, tracked_markets = None):
+  def __init__(self, baseURL, key, secret, tracked_markets=None):
     self.baseURL = baseURL
     self.client = api.Client(baseURL, key, secret)
     self._ws = None
@@ -45,7 +45,7 @@ class SafeTrade:
       f"{market.upper()} | last={tracked_ticker.last} open={tracked_ticker.open} "
       f"high={tracked_ticker.high} low={tracked_ticker.low} avg={tracked_ticker.avg_price} "
       f"change={tracked_ticker.price_change_percent}% volume={tracked_ticker.volume} "
-      f"amount={tracked_ticker.amount}"
+      f"traded_amount={tracked_ticker.amount}"
     )
 
   def subscribe(self, type, channel):
