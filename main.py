@@ -1,5 +1,5 @@
 import manager
-import asyncio
+import threading
 
 yourAPIkey = "<your_api_key>"
 yourAPISecret = "<your_secret_key>"
@@ -9,17 +9,16 @@ publicChannels = ["global.tickers", f"{trackedMarket}.depth", f"{trackedMarket}.
 
 safetrade = manager.SafeTrade(baseURL, yourAPIkey, yourAPISecret, tracked_markets = [trackedMarket])
 
-async def websocket_run():
+def websocket_run():
   print(f"Following ticker: {trackedMarket.upper()}")
   try:
     safetrade.subscribe("public", publicChannels)
-    await safetrade.run()
+    safetrade.run()
+    threading.Event().wait()
+  except KeyboardInterrupt:
+    print("Stopping the CPAY ticker stream.")
   except Exception as error:
     print(f"Unable to start the CPAY ticker stream: {error}")
-    return
-
-  while True:
-    await asyncio.sleep(1)
 
 if __name__ == "__main__":
-  asyncio.run(websocket_run())
+  websocket_run()

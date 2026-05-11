@@ -54,5 +54,5 @@ class SafeTrade:
   def unsubscribe(self, type, channel):
     self.ws.unsubscribe(type, channel)
 
-  async def run(self):
-    await self.ws.run()
+  def run(self):
+    self.ws.run()

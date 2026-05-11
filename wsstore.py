@@ -27,11 +27,15 @@ class WebsocketStore:
       socket.subscribe(channel)
 
   def unsubscribe(self, type, channel):
-    socket = self.public if type == "public" else self.private if type == "private" else None
+    socket = None
+    if type == "public":
+      socket = self.public
+    elif type == "private":
+      socket = self.private
     if socket is not None:
       socket.unsubscribe(channel)
 
-  async def run(self):
+  def run(self):
     threads = []
 
     if self.public is not None:
