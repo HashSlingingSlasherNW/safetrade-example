@@ -23,11 +23,14 @@ pip install -r requirements.txt
 
 ## Configuration
 
-1. Open main.py and replace <your_api_key> and <your_secret_key> with your actual SafeTrade API key and secret.
+1. Open `/home/runner/work/safetrade-example/safetrade-example/main.py` and update the tracked market or API credentials if needed.
 ```python
 yourAPIkey = "<your_api_key>"
 yourAPISecret = "<your_secret_key>"
+trackedMarket = "cpayusdt"
 ```
+
+The sample client is configured to follow the public `CPAY/USDT` ticker and print the latest ticker values as updates arrive. API credentials are only needed if you extend the example to call private REST or WebSocket endpoints.
 
 ## Running the Client
 To start the client, run the following command:
@@ -35,7 +38,7 @@ To start the client, run the following command:
 python main.py
 ```
 
-This will connect to the SafeTrade WebSocket and subscribe to the specified channels.
+This will connect to the SafeTrade WebSocket, subscribe to the CPAY public channels, and report CPAY ticker updates as they arrive.
 
 ## Project Structure
 - api.py: Contains the Client class for interacting with the SafeTrade API.
