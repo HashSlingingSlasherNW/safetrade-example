@@ -7,38 +7,52 @@ This is an example Python project that helps clients connect to the SafeTrade Cr
 - Python 3.7 or higher
 - pip (Python package installer)
 
-## Installation
+## Step-by-Step Setup
 
-1. Clone the repository:
+1. Clone the repository and move into the project folder:
 
 ```sh
 git clone https://github.com/safetrade-exchange/example-client.git
 cd example-client
 ```
 
-2. Install the required packages:
+2. (Optional) Create and activate a virtual environment:
+
+```sh
+python -m venv .venv
+source .venv/bin/activate
+```
+
+3. Install the required packages:
+
 ```sh
 pip install -r requirements.txt
 ```
 
-## Configuration
+4. Open `/home/runner/work/safetrade-example/safetrade-example/main.py` and review the sample configuration:
 
-1. Open `main.py` and update the tracked market or API credentials if needed.
 ```python
 yourAPIkey = "<your_api_key>"
 yourAPISecret = "<your_secret_key>"
+base_url = "https://safe.trade/api/v2"
 trackedMarket = "cpayusdt"
+publicChannels = ["global.tickers", f"{trackedMarket}.depth", f"{trackedMarket}.trades"]
 ```
 
-The sample client is configured to follow the public `CPAY/USDT` market and print the latest ticker values, order-book depth, and recent trade metrics as updates arrive. API credentials are only needed if you extend the example to call private REST or WebSocket endpoints.
+5. Update the values if needed:
+   - Leave the API key and secret as placeholders if you only want public market data.
+   - Change `trackedMarket` if you want to follow a different market.
+   - Keep `publicChannels` aligned with the selected market so ticker, depth, and trade updates are all subscribed.
 
-## Running the Client
-To start the client, run the following command:
+6. Start the client:
+
 ```sh
 python main.py
 ```
 
-This will connect to the SafeTrade WebSocket, subscribe to the CPAY public channels, and report CPAY ticker updates, order-book depth, and recent trade summaries as they arrive.
+7. Watch the output in your terminal.
+
+The sample client is configured to follow the public `CPAY/USDT` market and print ticker values, order-book depth, and recent trade metrics as updates arrive.
 
 ## Project Structure
 - api.py: Contains the Client class for interacting with the SafeTrade API.
