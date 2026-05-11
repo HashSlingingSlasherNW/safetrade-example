@@ -2,8 +2,8 @@ import ws
 import threading
 
 class WebsocketStore:
-  def __init__(self, baseURL, header=None, callback=None):
-    self.baseURL = baseURL
+  def __init__(self, base_url, header=None, callback=None):
+    self.base_url = base_url
     self.header = header
     self.callback = callback
     self.public = None
@@ -11,9 +11,9 @@ class WebsocketStore:
 
   def get_socket(self, type, create_socket=True):
     if create_socket and type == "public" and self.public is None:
-      self.public = ws.Websocket(self.baseURL, "public", None, self.callback)
+      self.public = ws.Websocket(self.base_url, "public", None, self.callback)
     elif create_socket and type == "private" and self.private is None:
-      self.private = ws.Websocket(self.baseURL, "private", self.header, self.callback)
+      self.private = ws.Websocket(self.base_url, "private", self.header, self.callback)
 
     if type == "public":
       return self.public

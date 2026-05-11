@@ -3,11 +3,11 @@ import threading
 
 yourAPIkey = "<your_api_key>"
 yourAPISecret = "<your_secret_key>"
-baseURL = "https://safe.trade/api/v2"
+base_url = "https://safe.trade/api/v2"
 trackedMarket = "cpayusdt"
 publicChannels = ["global.tickers", f"{trackedMarket}.depth", f"{trackedMarket}.trades"]
 
-safetrade = manager.SafeTrade(baseURL, yourAPIkey, yourAPISecret, tracked_markets=[trackedMarket])
+safetrade = manager.SafeTrade(base_url, yourAPIkey, yourAPISecret, tracked_markets=[trackedMarket])
 
 def websocket_run():
   print(f"Following ticker: {trackedMarket.upper()}")

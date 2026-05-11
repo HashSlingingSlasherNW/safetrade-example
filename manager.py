@@ -4,9 +4,9 @@ import wsstore
 import ticker
 
 class SafeTrade:
-  def __init__(self, baseURL, key, secret, tracked_markets=None):
-    self.baseURL = baseURL
-    self.client = api.Client(baseURL, key, secret)
+  def __init__(self, base_url, key, secret, tracked_markets=None):
+    self.base_url = base_url
+    self.client = api.Client(base_url, key, secret)
     self._ws = None
     self.tickers = {}
     self.order_books = {}
@@ -16,7 +16,7 @@ class SafeTrade:
   @property
   def ws(self):
     if self._ws is None:
-      self._ws = wsstore.WebsocketStore(self.baseURL, self.client.get_authentication(), self.callback)
+      self._ws = wsstore.WebsocketStore(self.base_url, self.client.get_authentication(), self.callback)
     return self._ws
 
   def callback(self, data):
@@ -96,20 +96,20 @@ class SafeTrade:
     if not isinstance(payload, dict):
       return
 
-    for market, marketData in payload.items():
-      if not isinstance(marketData, dict):
+    for market, market_data in payload.items():
+      if not isinstance(market_data, dict):
         continue
 
       normalized_market = "".join(character for character in market.lower() if character.isalnum())
       self.tickers[normalized_market] = ticker.Ticker(
-        marketData.get("amount"),
-        marketData.get("avg_price"),
-        marketData.get("high"),
-        marketData.get("last"),
-        marketData.get("low"),
-        marketData.get("open"),
-        marketData.get("price_change_percent"),
-        marketData.get("volume")
+        market_data.get("amount"),
+        market_data.get("avg_price"),
+        market_data.get("high"),
+        market_data.get("last"),
+        market_data.get("low"),
+        market_data.get("open"),
+        market_data.get("price_change_percent"),
+        market_data.get("volume")
       )
 
       if normalized_market in self.tracked_markets:
@@ -228,7 +228,13 @@ class SafeTrade:
       if timestamp is None:
         latest_trade = trade
         continue
-      if latest_timestamp is None or str(timestamp) > str(latest_timestamp):
+      timestamp_value = self.to_decimal(timestamp)
+      latest_timestamp_value = self.to_decimal(latest_timestamp)
+      if latest_timestamp is None or (
+        timestamp_value is not None and latest_timestamp_value is not None and timestamp_value > latest_timestamp_value
+      ) or (
+        timestamp_value is None and latest_timestamp_value is None and str(timestamp) > str(latest_timestamp)
+      ):
         latest_trade = trade
         latest_timestamp = timestamp
 
@@ -347,7 +353,7 @@ class SafeTrade:
   def calculate_spread_percent(self, best_bid, best_ask):
     bid = self.to_decimal(best_bid)
     ask = self.to_decimal(best_ask)
-    if bid is None or ask is None or ask == 0:
+    if bid is None or ask is None or ask <= 0:
       return "n/a"
     return f"{self.format_decimal(((ask - bid) / ask) * Decimal('100'))}%"
 
