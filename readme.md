@@ -30,7 +30,7 @@ yourAPISecret = "<your_secret_key>"
 trackedMarket = "cpayusdt"
 ```
 
-The sample client is configured to follow the public `CPAY/USDT` ticker and print the latest ticker values as updates arrive. API credentials are only needed if you extend the example to call private REST or WebSocket endpoints.
+The sample client is configured to follow the public `CPAY/USDT` market and print the latest ticker values, order-book depth, and recent trade metrics as updates arrive. API credentials are only needed if you extend the example to call private REST or WebSocket endpoints.
 
 ## Running the Client
 To start the client, run the following command:
@@ -38,7 +38,7 @@ To start the client, run the following command:
 python main.py
 ```
 
-This will connect to the SafeTrade WebSocket, subscribe to the CPAY public channels, and report CPAY ticker updates as they arrive.
+This will connect to the SafeTrade WebSocket, subscribe to the CPAY public channels, and report CPAY ticker updates, order-book depth, and recent trade summaries as they arrive.
 
 ## Project Structure
 - api.py: Contains the Client class for interacting with the SafeTrade API.
