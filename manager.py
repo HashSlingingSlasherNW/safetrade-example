@@ -23,11 +23,11 @@ class SafeTrade:
     for channel, payload in self.iter_channels(data):
       if channel == "global.tickers":
         self.update_tickers(payload)
-      elif channel.endswith(".depth"):
+      elif channel.endswith(".depth") or channel.startswith("depth."):
         market = self.get_market_from_channel(channel, payload, "depth")
         if market is not None:
           self.update_order_book(market, payload)
-      elif channel.endswith(".trades"):
+      elif channel.endswith(".trades") or channel.startswith("trades."):
         market = self.get_market_from_channel(channel, payload, "trades")
         if market is not None:
           self.update_trades(market, payload)
@@ -80,7 +80,7 @@ class SafeTrade:
       for key in ("market", "symbol", "pair"):
         market = payload.get(key)
         if isinstance(market, str):
-          return "".join(character for character in market.lower() if character.isalnum())
+          return self.normalize_market_name(market)
       if "data" in payload:
         return self.extract_market(payload["data"])
     return None
@@ -89,7 +89,7 @@ class SafeTrade:
     if channel.endswith(f".{suffix}"):
       return channel[:-(len(suffix) + 1)]
     if channel.startswith(f"{suffix}."):
-      return "".join(character for character in channel[(len(suffix) + 1):] if character.isalnum())
+      return self.normalize_market_name(channel[(len(suffix) + 1):])
     return self.extract_market(payload)
 
   def update_tickers(self, payload):
@@ -100,7 +100,7 @@ class SafeTrade:
       if not isinstance(market_data, dict):
         continue
 
-      normalized_market = "".join(character for character in market.lower() if character.isalnum())
+      normalized_market = self.normalize_market_name(market)
       self.tickers[normalized_market] = ticker.Ticker(
         market_data.get("amount"),
         market_data.get("avg_price"),
@@ -228,13 +228,7 @@ class SafeTrade:
       if timestamp is None:
         latest_trade = trade
         continue
-      timestamp_value = self.to_decimal(timestamp)
-      latest_timestamp_value = self.to_decimal(latest_timestamp)
-      if latest_timestamp is None or (
-        timestamp_value is not None and latest_timestamp_value is not None and timestamp_value > latest_timestamp_value
-      ) or (
-        timestamp_value is None and latest_timestamp_value is None and str(timestamp) > str(latest_timestamp)
-      ):
+      if self.is_later_timestamp(timestamp, latest_timestamp):
         latest_trade = trade
         latest_timestamp = timestamp
 
@@ -294,7 +288,7 @@ class SafeTrade:
     sell_volume = self.sum_trade_amounts(trades, "sell")
     total_volume = self.sum_trade_amounts(trades)
     average_price = self.calculate_average_trade_price(trades)
-    side = "n/a" if latest_trade is None else latest_trade.get("side") or latest_trade.get("type") or "n/a"
+    side = self.get_trade_side(latest_trade)
     price = "n/a" if latest_trade is None else latest_trade.get("price", "n/a")
 
     return (
@@ -353,12 +347,27 @@ class SafeTrade:
   def calculate_spread_percent(self, best_bid, best_ask):
     bid = self.to_decimal(best_bid)
     ask = self.to_decimal(best_ask)
-    if bid is None or ask is None or ask <= 0:
+    if bid is None or ask is None or bid <= 0 or ask <= 0:
       return "n/a"
     return f"{self.format_decimal(((ask - bid) / ask) * Decimal('100'))}%"
 
   def sort_levels(self, levels, reverse=False):
     return sorted(levels, key=self.level_sort_key, reverse=reverse)
+
+  def normalize_market_name(self, market):
+    return "".join(character for character in str(market).lower() if character.isalnum())
+
+  def is_later_timestamp(self, timestamp, latest_timestamp):
+    if latest_timestamp is None:
+      return True
+
+    timestamp_value = self.to_decimal(timestamp)
+    latest_timestamp_value = self.to_decimal(latest_timestamp)
+
+    if timestamp_value is not None and latest_timestamp_value is not None:
+      return timestamp_value > latest_timestamp_value
+
+    return str(timestamp) > str(latest_timestamp)
 
   def to_decimal(self, value):
     try:
@@ -373,6 +382,11 @@ class SafeTrade:
     if price is None:
       return Decimal("0")
     return price
+
+  def get_trade_side(self, trade):
+    if trade is None:
+      return "n/a"
+    return trade.get("side") or trade.get("type") or "n/a"
 
   def format_decimal(self, value):
     if value is None:

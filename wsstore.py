@@ -32,12 +32,10 @@ class WebsocketStore:
       socket.unsubscribe(channel)
 
   def run(self):
-    threads = []
-
-    if self.public is not None:
-      threads.append(threading.Thread(target=self.public.onMessage, daemon=True))
-    if self.private is not None:
-      threads.append(threading.Thread(target=self.private.onMessage, daemon=True))
+    threads = [self.build_listener_thread(socket) for socket in (self.public, self.private) if socket is not None]
 
     for thread in threads:
       thread.start()
+
+  def build_listener_thread(self, socket):
+    return threading.Thread(target=socket.onMessage, daemon=True)
