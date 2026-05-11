@@ -35,9 +35,9 @@ class WebsocketStore:
     threads = []
 
     if self.public is not None:
-      threads.append(threading.Thread(target=self.public.onMessage, daemon = True))
+      threads.append(threading.Thread(target=self.public.onMessage, daemon=True))
     if self.private is not None:
-      threads.append(threading.Thread(target=self.private.onMessage, daemon = True))
+      threads.append(threading.Thread(target=self.private.onMessage, daemon=True))
 
     for thread in threads:
       thread.start()

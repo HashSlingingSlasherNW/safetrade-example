@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 ## Configuration
 
-1. Open `/home/runner/work/safetrade-example/safetrade-example/main.py` and update the tracked market or API credentials if needed.
+1. Open `main.py` and update the tracked market or API credentials if needed.
 ```python
 yourAPIkey = "<your_api_key>"
 yourAPISecret = "<your_secret_key>"
