@@ -2,8 +2,8 @@ import websocket
 import json
 
 class Websocket:
-  def __init__(self, baseURL, type, header, callback = None):
-    self.wsUrl = baseURL.replace("https://", "wss://").replace('http://', 'ws://') + "/websocket/"
+  def __init__(self, base_url, type, header, callback = None):
+    self.wsUrl = base_url.replace("https://", "wss://").replace('http://', 'ws://') + "/websocket/"
     self.callback = callback
     self.ws = websocket.create_connection(url=self.wsUrl+type, header=header)
 
@@ -32,5 +32,5 @@ class Websocket:
     while True:
       res = self.ws.recv()
 
-      if self.callback != None:
+      if self.callback is not None:
         self.callback(json.loads(res))

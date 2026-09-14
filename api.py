@@ -7,8 +7,8 @@ import binascii
 import time
 
 class Client:
-  def __init__(self, baseURL, key, secret):
-    self.baseURL = baseURL
+  def __init__(self, base_url, key, secret):
+    self.base_url = base_url
     self.key = key
     self.secret = secret
     self.headers = {}
@@ -28,7 +28,7 @@ class Client:
         auth_headers = self.get_authentication()
         if headers:
             auth_headers.update(headers)
-        response = requests.get(self.baseURL + url, headers=auth_headers, params=query)
+        response = requests.get(self.base_url + url, headers=auth_headers, params=query)
         if response.status_code == 200:
             return response.json()
         else:
@@ -43,7 +43,7 @@ class Client:
         auth_headers = self.get_authentication()
         if headers:
             auth_headers.update(headers)
-        response = requests.post(self.baseURL + url, headers=auth_headers, json=data)
+        response = requests.post(self.base_url + url, headers=auth_headers, json=data)
         if response.status_code in (200, 201):
             return response.json()
         else:
